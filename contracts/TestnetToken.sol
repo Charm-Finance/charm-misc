@@ -13,19 +13,36 @@ contract TestnetToken is ERC20 {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    uint256 public mintAmount;
+    address public owner;
+    mapping(address => uint256) public cooldownTimes;
+
+    uint256 public faucetAmount;
+    uint256 public faucetCooldown;
 
     constructor(
         string memory name,
         string memory symbol,
         uint8 decimals,
-        uint256 _mintAmount
+        uint256 _faucetAmount,
+        uint256 _faucetCooldown
     ) public ERC20(name, symbol) {
         _setupDecimals(decimals);
-        mintAmount = _mintAmount;
+        faucetAmount = _faucetAmount;
+        faucetCooldown = _faucetCooldown;
+        owner = msg.sender;
     }
 
-    function mint(address account) public {
-        _mint(account, mintAmount);
+    function getTokens(address account) public {
+        require(
+            block.timestamp > cooldownTimes[account].add(faucetCooldown),
+            "cooldown"
+        );
+        cooldownTimes[account] = block.timestamp;
+        _mint(account, faucetAmount);
+    }
+
+    function mint(address account, uint256 amount) public {
+        require(msg.sender == owner, "!owner");
+        _mint(account, amount);
     }
 }
