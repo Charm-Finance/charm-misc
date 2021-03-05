@@ -2,11 +2,15 @@
 
 pragma solidity ^0.6.12;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/drafts/ERC20Permit.sol";
 
-contract CharmToken is ERC20 {
-    constructor(address treasury) public ERC20("Charm", "CHARM") {
-        // total supply is 100 million
+contract CharmToken is ERC20Permit {
+    constructor(address treasury)
+        public
+        ERC20Permit("Charm")
+        ERC20("Charm", "CHARM")
+    {
+        // total supply is 100 million and decimal places is 18
         _mint(treasury, 1e8 * 1e18);
     }
 }
